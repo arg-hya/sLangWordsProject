@@ -1,0 +1,15 @@
+/data/
+/venv/
+/debug.txt
+/test1.py
+/test2.py
+/test4.py
+/misc.py
+/maze.svg
+/main.py
+/SynonymExtraction/
+/SlangClustering/
+/DBConnector/
+/CompiledSLangs/
+/ArticleParser/
+/.idea/
