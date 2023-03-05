@@ -1,10 +1,13 @@
 import enchant
-# This is a sample Python script.
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-from NERFilter import applyStanfordNER, applySpicyNER
+from NERFilter import applyStanfordNER
 
+# import nltk
+# nltk.download('punkt')
+
+import os
+java_path = r"C:\Program Files (x86)\Java\jre1.8.0_341\bin\java.exe"
+os.environ['JAVAHOME'] = java_path
 
 def print_hi(name):
     # Use a breakpoint in the code line below to debug your script.
@@ -13,7 +16,7 @@ def print_hi(name):
     d = enchant.Dict("en_US")
     print(d.check("Hello"))
 
-
+print("Hello world!")
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     #print_hi('PyCharm')

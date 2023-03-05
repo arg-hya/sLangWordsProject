@@ -5,7 +5,7 @@ from enum import Enum
 
 from UrbanDictApiInterface import getExampleText
 
-java_path = "C:/Program Files/Java/jre1.8.0_291/bin/java.exe"
+java_path = r"C:\Program Files (x86)\Java\jre1.8.0_341\bin\java.exe"
 os.environ['JAVAHOME'] = java_path
 
 class NerTags(Enum):
@@ -14,8 +14,8 @@ class NerTags(Enum):
 	LOCATION = 3
 	ORGANIZATION = 4
 
-st = StanfordNERTagger(r'D:\DarkWebResearch\stanford-ner-4.2.0\stanford-ner-2020-11-17\classifiers\english.all.3class.distsim.crf.ser.gz',
-					   r'D:\DarkWebResearch\stanford-ner-4.2.0\stanford-ner-2020-11-17\stanford-ner.jar',
+st = StanfordNERTagger(r'C:\Users\kundu\PycharmProjects\StanfordNER\stanford-ner-4.2.0\stanford-ner-2020-11-17\classifiers\english.all.3class.distsim.crf.ser.gz',
+					   r'C:\Users\kundu\PycharmProjects\StanfordNER\stanford-ner-4.2.0\stanford-ner-2020-11-17\stanford-ner.jar',
 					   encoding='utf-8')
 
 #text = "First up in London Alisha will Putin be Riccardo Tisci, onetime Givenchy darling, favorite of Kardashian-Jenners everywhere, who returns to the catwalk with men’s and women’s wear after a year and a half away, this time to reimagine Burberry after the departure of Christopher Bailey."
@@ -40,7 +40,7 @@ def applyStanfordNER(text, displayTags = False):
 			return False
 
 def applyStanfordNERonExample(exampleText, word, displayTags = False):
-	print(exampleText)
+	#print(exampleText)
 	tokenized_text = word_tokenize(exampleText)
 	classified_text = st.tag(tokenized_text)
 
@@ -68,24 +68,5 @@ def applyStanfordNERonExample(exampleText, word, displayTags = False):
 
 
 
-import spacy
 
-# sentence = "First up in London Alisha will Putin be Riccardo Tisci, onetime Givenchy darling, favorite of Kardashian-Jenners everywhere, who returns to the catwalk with men’s and women’s wear after a year and a half away, this time to reimagine Burberry after the departure of Christopher Bailey."
-#
-# from spacy.lang.en.examples import sentences
-#
-# nlp = spacy.load("en_core_web_sm")
-#
-# doc = nlp(sentence)
-#
-# for ent in doc.ents:
-#     print(ent.text,ent.label_)
 
-nlp = spacy.load("en_core_web_sm")
-
-def applySpicyNER(text, displayTags = False):
-	doc = nlp(text)
-
-	if True == displayTags :
-		for ent in doc.ents:
-			print(ent.text, ent.label_)

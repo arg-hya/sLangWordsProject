@@ -70,10 +70,25 @@ def remove_all_extra_characters(string):
     return string.strip()
 
 def getResponseForWord(word, printResponse = False):
-    response = requests.get(f"http://api.urbandictionary.com/v0/define?term={word}")
+    #response = requests.get(f"http://api.urbandictionary.com/v0/define?term={word}")
 
+    count_retry = 0
+    while(count_retry != 5):
+        try:
+            #print("Getting the word : ", word)
+            response = requests.get(f"http://api.urbandictionary.com/v0/define?term={word}")
+            response.raise_for_status()
+            break
+        except requests.exceptions.ConnectionError as conerr:
+            print("Timeout. Retrying count : ", count_retry)
+            count_retry = count_retry + 1
+
+    if count_retry == 5:
+        raise Exception("Timeout occured.")
     if True == printResponse :
         print(json.dumps(response.text, indent=4, sort_keys=True))
+
+    #print("Got the word")
 
     return response.text
 

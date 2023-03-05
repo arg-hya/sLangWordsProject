@@ -16,8 +16,8 @@ def nerTest():
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     print("Starting...")
-    file = "debug.txt"
-    f = open(file, "w")
+    file = "data/O.csv"
+    f = open(file, "a")
     pageNum = 1
     for entry_set in fromParticularPageTest():
         for word in entry_set:
@@ -25,7 +25,7 @@ if __name__ == '__main__':
             if sLangWord:
                 print("Keeping this word : ", sLangWord)
                 f.write(sLangWord + ' , ' + definition + '\n')
-        # if pageNum == 10:
-        #    break
+        if pageNum == 300 :
+            break
         pageNum += 1
     f.close()

@@ -2,6 +2,8 @@ from NERFilter import applyStanfordNERonExample
 from UrbanDictApiInterface import getWord
 from WiktionaryInterface import getDefinationfromWikiDictionary
 
+VERBOSE = False
+
 slangWord = ['','']
 
 def allCharactersSame(s):
@@ -55,24 +57,30 @@ def setDefinition(wordObj):
     #get definition from Urban Dictionary
     defination_UB = wordObj.getDefinition()
 
-    if defination_WIKI :
+    if defination_WIKI and defination_WIKI != 'NOT_DEFINED_WIKI':
         slangWord[1] = defination_WIKI
-        print("Def from Wiki : ", defination_WIKI)
+        if VERBOSE :
+            print("Def from Wiki : ", defination_WIKI)
     else :
         slangWord[1] = defination_UB
-        print("Def from UB : ", defination_UB)
+        if VERBOSE:
+            print("Def from UB : ", defination_UB)
 
 def applyAdvancedFilters(word):
     wordObj = getWord(word)
     wordScore = wordObj.getScore()
 
     if wordScore < 200 :
-        print("Low Score: ", word)
+        if VERBOSE:
+            print("Low Score: ", word)
         return False
-
-    print("Applying advanced filters for : ", wordObj.getUrbanWord())
     exampleText = wordObj.getExample()
-    if False == applyStanfordNERonExample(exampleText, wordObj.getUrbanWord(), False):
+
+    if VERBOSE:
+        print("Applying advanced filters for : ", wordObj.getUrbanWord())
+        print("Example used: ", exampleText)
+
+    if False == applyStanfordNERonExample(exampleText, wordObj.getUrbanWord(), VERBOSE):
         return False
 
     #Mark the wordObj as valid
@@ -87,10 +95,13 @@ def passFilterPipelineAndGetDefinition(word):
     slangWord[0] = ''
     slangWord[1] = ''
 
+    if VERBOSE:
+        print("Applying filters for word: ", word)
     if True == applyBasicFilters(word):
         if True == applyAdvancedFilters(word):
             modifyWord(word)
-            print(slangWord)
+            if VERBOSE:
+                print(slangWord)
             return tuple(slangWord)
 
     return tuple(slangWord)

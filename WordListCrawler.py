@@ -6,16 +6,19 @@ import os
 import argparse
 import re
 
-from FilterPipeline import passFilterPipelineAndGetDefinition
+from FilterPipeline import passFilterPipelineAndGetDefinition, VERBOSE
 from NERFilter import applyStanfordNER, applyStanfordNERonExample
 from UrbanDictApiInterface import getWord
 
 API = "https://www.urbandictionary.com/browse.php?character={0}"
 
-MAX_ATTEMPTS = 10
+MAX_ATTEMPTS = 40
 DELAY = 10
 
 NUMBER_SIGN = "*"
+
+#count_word = 0
+
 
 # https://stackoverflow.com/a/554580/306149
 class NoRedirection(urllib.request.HTTPErrorProcessor):
@@ -81,14 +84,17 @@ def download_letter_entries(letter, file):
     print("Output File : ", args.out)
     f = open(file, "w")
     pageNum = 1
+    #global count_word
     for entry_set in extract_letter_entries(letter):
         for word in entry_set:
+            #count_word = count_word + 1
             sLangWord, definition = passFilterPipelineAndGetDefinition(word)
             if sLangWord :
                 print("Keeping this word : ", sLangWord)
                 f.write(sLangWord + ' , ' + definition + '\n')
-        if pageNum == 10:
-            break
+        # if pageNum == 300:
+        #     break
+        #print("Word number : ", count_word)
         pageNum += 1
     f.close()
 
@@ -101,8 +107,8 @@ def download_entries(letters, file):
 
 def fromParticularPageTest():
     print("Starting...")
-    url = "https://www.urbandictionary.com/browse.php?character=Z&page=5"
-    letter = 'A'
+    url = "https://www.urbandictionary.com/browse.php?character=O&page=111"
+    letter = 'O'
     print("URL : ", url)
     while url:
         print(url)
