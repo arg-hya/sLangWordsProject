@@ -1,26 +1,62 @@
 # Press the green button in the gutter to run the script.
 import csv
+import os
+import re
+from pathlib import Path
 
 from CompiledSLangs.DefinitionExtractor import getDifinition
 from DBConnector.DataAccessInterface import writeSlangAndDefinitionAndSynonym
-from SynonymExtraction.SynonymExtrator_1000 import  getSynonym
+#from SynonymExtraction.SynonymExtrator_1000 import  getSynonym
+from SynonymExtraction.SynonymExtractor_WordNet import getSynonym
+import pandas as pd
 
+import enchant
+d = enchant.Dict("en_US")
+
+alphabets = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+alphabets_sample = ['L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+
+rootDir = "Additional_UrbanWordsList"
+slangDBFilePaths = [rootDir + "/bad_phrases.txt",
+                    rootDir + "/bad_words.txt",
+                    rootDir + "/common_curse_words.txt",
+                    rootDir + "/Google_WDYL_Project.txt",
+                    rootDir + "/profanity_wordlist.txt",
+                    rootDir + "/profanity-filter.txt",
+                    rootDir + "/Shutterstock.txt"
+                    ]
+
+def addMissedCommonWords():
+    infile = open(slangDBFilePaths[3], mode='r', encoding="utf-8")
+    list_infile = list(infile)
+    for k in range(0, len(list_infile)):
+        list_infile[k] = list_infile[k].strip()
+
+    for item in list_infile:
+        # Trimm the strings
+        item = item.strip()
+
+        # if 20 == count :
+        #     break
+        # else :
+        #     count = count + 1
+
+        definition = getDifinition(item)
+        if 'NOT_DEFINED_WIKI' == definition or \
+                0 == len(definition) or \
+                item == definition:
+            continue
+
+        # Trimm the strings
+        definition = definition.strip()
+        print(item, " : ", definition)
+        putInDB(item, definition)
 
 def createMergedDB():
     SlangDBs = []
-    rootDir = "Additional_UrbanWordsList"
-    slangDBFilePaths = [rootDir + "/bad_phrases.txt",
-                        rootDir + "/bad_words.txt",
-                        rootDir + "/common_curse_words.txt",
-                        rootDir + "/Google_WDYL_Project.txt",
-                        rootDir + "/profanity_wordlist.txt",
-                        rootDir + "/profanity-filter.txt",
-                        rootDir + "/Shutterstock.txt"
-                        ]
     #Read and Merge all the datasets
     print("Read and Merge all the datasets...")
     print(slangDBFilePaths)
-
     sum = 0
     for i in range(0,len(slangDBFilePaths)) :
         print("Loading TestSlang Database :: ", slangDBFilePaths[i])
@@ -109,28 +145,104 @@ def ModifyMergedDB():
 
     print(slang_dict)
 
+def putInDB(word, definition, abbs = False):
+    word = word.lower()
+    synonym = definition
+    if abbs == False :
+        synonym = getSynonym(definition)
+    # Insert in DB
+    print(word, " :syn: ", synonym)
+    writeSlangAndDefinitionAndSynonym(word, definition, synonym)
+
+def isCommonWord(word):
+    word = word.lower()
+    return d.check(word)
+
 def createMergedDBwithSynonyms() :
     slang_dict = readMergedDBbyLine()
     #print(slang_dict)
 
     for key in slang_dict.keys() :
+        if isCommonWord(key) :      #Apply english language words filter
+            print("Common word : ", key)
+            continue
         print(key, " : ", slang_dict[key])
-        synonym = getSynonym(slang_dict[key])
-        #input("Press Enter to continue...")
+        putInDB(key, slang_dict[key])
 
-        #Insert in DB
-        writeSlangAndDefinitionAndSynonym(key, slang_dict[key], synonym)
+    ##Take care of missed words
+    #addMissedCommonWords()
 
-if __name__ == '__main__':
+def executeCompiledSlangs():
+    #Create the merged DB
+    #createMergedDB()
 
-    ##Create the merged DB
-    ##createMergedDB()
-
-    ##Clean Merged DB
+    #Clean Merged DB
     #ModifyMergedDB() #Nothing done yet
 
     #Get Synonyms
     createMergedDBwithSynonyms()
+
+def executeAbbsSlangs():
+    filepath_abbs = "../ArticleParser/AllAbbreviationsData.csv"
+    df1 = pd.read_csv(filepath_abbs, sep=",", encoding='mac_roman')
+    for index, row in df1.iterrows():
+        word = row[0]
+        definition = row[1]
+        putInDB(word, definition, abbs = True)
+
+def excuteUBslangs():
+    for alphabet in alphabets_sample:
+        dirpath = "../data/" + alphabet
+        # iterate over files in
+        # that directory
+        files = Path(dirpath).glob('*')
+        for file in files:
+            print("Processing file : ", file)
+            with open(file, 'r') as f:
+                for line in f:
+                    word = line.split(" ", 1)[0]
+                    if isCommonWord(word):  # Apply english language words filter
+                        print("Common word : ", word)
+                        continue
+                    definition = line.split(" ", 1)[1:][0]
+                    definition = re.sub('[:;,!@#$]', '', definition)
+                    #print(word, " : ", definition)
+                    putInDB(word, definition)
+            print("Processed file : ", file)
+
+
+def testCreateDB():
+    filepath_abbs = "../CompiledSLangs/Additional_UrbanWordsList/test_list.csv"
+    df1 = pd.read_csv(filepath_abbs, sep=",", encoding='mac_roman')
+    for index, row in df1.iterrows():
+        word = row[0]
+        definition = row[1]
+        print(word, " : ", definition)
+        putInDB(word, definition)
+
+if __name__ == '__main__':
+
+    # #Test creation of DB
+    # testCreateDB()
+
+    # #Add the abbreviations
+    # print("Adding abbreviations to the database...")
+    # executeAbbsSlangs()
+    # #Add the slangs form other sources
+    # print("Adding compiled slangs to the database...")
+    # executeCompiledSlangs()
+    # #Add the MissedCommonWords
+    # print("Adding MissedCommonWords to the database...")
+    # addMissedCommonWords()
+    #Add the slangs from UB
+    print("Adding UB slangs to the database...")
+    excuteUBslangs()
+
+
+
+
+
+
 
 
 

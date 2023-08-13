@@ -16,7 +16,7 @@ def nerTest():
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     print("Starting...")
-    file = "data/O.csv"
+    file = "data/A.csv"
     f = open(file, "a")
     pageNum = 1
     for entry_set in fromParticularPageTest():

@@ -10,7 +10,7 @@ def get_cosine_similarity(feature_vec_1, feature_vec_2):
     return cosine_similarity(feature_vec_1.reshape(1, -1), feature_vec_2.reshape(1, -1))[0][0]
 
 print("Loading Barron's 1000 word databse embedding...")
-all_embeddings = np.load(r'C:\Users\User\PycharmProjects\sLangDB\SynonymExtraction\Barrons_Words_1000\barron_1000_embeddings.npy')
+all_embeddings = np.load(r'..\SynonymExtraction\Barrons_Words_1000\barron_1000_embeddings.npy')
 print("all_embeddings length : ", len(all_embeddings))
 
 def getSynonym(test_str) :
@@ -39,10 +39,9 @@ def getSynonym(test_str) :
         index += 1
 
     # creating a data frame
-    df = pd.read_csv(r"C:\Users\User\PycharmProjects\sLangDB\SynonymExtraction\Barrons_Words_1000\barrons_def_1000.csv")
+    df = pd.read_csv(r"..\SynonymExtraction\Barrons_Words_1000\barrons_def_1000.csv")
     # print(best_index)
-    print(df['Word'][best_index])
-    print(df['Defination'][best_index])
+    #print(df['Word'][best_index], " : ", df['Defination'][best_index])
 
     # sorted_score = collections.OrderedDict(sorted(scores.items(), reverse=True))
     #
@@ -52,6 +51,7 @@ def getSynonym(test_str) :
     #     if 5 == count:
     #         break
     #     print("-------------Recommendation---------- :: ", count)
-    #     print(df['word'][index])
-    #     print(df['definition'][index])
+    #     print(df['Word'][index], " : ", df['Defination'][index])
+
+    return df['Word'][best_index]
 

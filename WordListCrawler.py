@@ -107,8 +107,8 @@ def download_entries(letters, file):
 
 def fromParticularPageTest():
     print("Starting...")
-    url = "https://www.urbandictionary.com/browse.php?character=O&page=111"
-    letter = 'O'
+    url = "https://www.urbandictionary.com/browse.php?character=A&page=1011"
+    letter = 'A'
     print("URL : ", url)
     while url:
         print(url)

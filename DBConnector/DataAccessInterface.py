@@ -36,21 +36,29 @@ def getSlangSynonym(word):
     word = word.strip()
     return DBReader.getInstance().select_synonym_by_slang(word)[0][0]
 
+def debugPrintDB():
+    DBReader.getInstance().debug_printDB()
 
 # #DBReader.getInstance().select_all_tasks()
+# writeSlangAndDefinitionAndSynonym('slang40', 'def40', 'syn40')
+# print(isWordSlang('slang40'))
+# print(getSlangDefinition('slang40'))
 # print(isWordSlang('slang2'))
 # print(getSlangDefinition('slang2'))
-# print(getSlangSynonym('slang2'))
-#
+
 # writeSlangAndDefinitionAndSynonym('slang4', 'def4', 'syn4')
 # writeSlangAndDefinitionAndSynonym('slang2', 'def5', 'syn5')
 # writeSlangAndDefinitionAndSynonym('slang6', 'def6', 'syn6')
 #
+# print(isWordSlang('slang26'))
 # print(isWordSlang('slang6'))
 # print(getSlangDefinition('slang6'))
 # print(getSlangSynonym('slang6'))
-#
-# print(isWordSlang('slang2'))
-# print(getSlangDefinition('slang2'))
-# print(getSlangSynonym('slang2'))
+# writeSlangAndDefinitionAndSynonym('slang6', 'def_new', 'syn_new')
+# print(isWordSlang('slang6'))
+# print(getSlangDefinition('slang6'))
+# print(getSlangSynonym('slang6'))
+
+#debugPrintDB()
+
 

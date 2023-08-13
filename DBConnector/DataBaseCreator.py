@@ -9,6 +9,8 @@ create_table_sql = """ CREATE TABLE IF NOT EXISTS projects (
                                         synonym text
                                     ); """
 
+#check_table_exists = """SELECT name FROM sqlite_master WHERE type='table' AND name='{table_name}'"""
+
 insert_row_sql = ''' INSERT INTO projects(slang,definition,synonym)
           VALUES(?,?,"NULL") '''
 
@@ -21,6 +23,10 @@ update_row_sql = ''' UPDATE projects
 
 delete_row_sql = 'DELETE FROM projects WHERE slang=?'
 
+check_slang_exists_sql = """ SELECT COUNT(1)
+                        FROM projects
+                        WHERE slang = ? """
+
 def sql_trace(stmt, bindings):
     #'Echoes all SQL executed'
     print("SQL:", stmt)
@@ -31,6 +37,7 @@ def sql_trace(stmt, bindings):
 class DBCreator:
    __instance = None
    dbpath_write = '../data/database/slangs.db'
+   #dbpath_write = '../data/database/testDB.db'
    @staticmethod
    def getInstance():
       """ Static access method. """
@@ -44,17 +51,17 @@ class DBCreator:
            raise Exception("This class is a singleton!")
        else:
            try:
-               # if not os.path.exists(self.dbpath_write):
-                   self.conn = sqlite3.connect(self.dbpath_write)
-                   self.cur = self.conn.cursor()
-                   DBCreator.__instance = self
-                   print("Database created...")
-                   self.create_table()
-                   print("Table created...")
-                   if echo:
-                       self.cur.setexectrace(sql_trace)
+               #if not os.path.exists(self.dbpath_write):
+               self.conn = sqlite3.connect(self.dbpath_write)
+               self.cur = self.conn.cursor()
+               DBCreator.__instance = self
+               print("Database created...")
+               self.create_table()
+               print("Table created...")
+               if echo:
+                   self.cur.setexectrace(sql_trace)
                # else:
-               #     print('Database already exists : ' + self.dbpath_write)
+               #      print('Database already exists : ' + self.dbpath_write)
            except Error as details:
                print("Unable to open db file: ", self.dbpath_write, details)
 
@@ -74,14 +81,23 @@ class DBCreator:
        except Error as e:
            print(e)
 
+   def is_present(self, slang):
+       self.cur.execute(check_slang_exists_sql, (slang,))
+       res = self.cur.fetchall()
+       if 1 == res[0][0]:
+           return True
+       return False
+
    def insert_SlangAndDef(self, slang, definition):
-       self.cur.execute(insert_row_sql, (slang, definition))
-       self.conn.commit()
+       if self.is_present(slang) == False:
+           self.cur.execute(insert_row_sql, (slang, definition))
+           self.conn.commit()
        return self.cur.lastrowid
 
    def insert_SlangAndDefAndSyn(self, slang, definition, syn):
-       self.cur.execute(insert_row_all_sql, (slang, definition, syn))
-       self.conn.commit()
+       if self.is_present(slang) == False:
+           self.cur.execute(insert_row_all_sql, (slang, definition, syn))
+           self.conn.commit()
        return self.cur.lastrowid
 
 

@@ -5,6 +5,9 @@ import os
 check_slang_exists_sql = """ SELECT COUNT(1)
                         FROM projects
                         WHERE slang = ? """
+print_table = """SELECT * FROM projects"""
+
+count_table = """SELECT COUNT(*) FROM projects"""
 
 def sql_trace(stmt, bindings):
     #'Echoes all SQL executed'
@@ -16,6 +19,7 @@ def sql_trace(stmt, bindings):
 class DBReader:
    __instance = None
    dbpath_write = '../data/database/slangs.db'
+   #dbpath_write = '../data/database/testDB.db'
    @staticmethod
    def getInstance():
       """ Static access method. """
@@ -91,6 +95,18 @@ class DBReader:
            return True
        return False
 
-# DBReader.getInstance().select_all_tasks()
+   def debug_printDB(self):
+       self.cur.execute(print_table)
+       res = self.cur.fetchall()
+       print("Printing DB...")
+       print(len(res))
+
+   def countWordsDB(self):
+       self.cur.execute(count_table)
+       res = self.cur.fetchall()
+       print("Total number of Slangs: ", res)
+
+# # DBReader.getInstance().select_all_tasks()
 # print(DBReader.getInstance().is_slang('slang23'))
 # DBReader.getInstance().select_row_by_slang('slang2', True)
+DBReader.getInstance().countWordsDB()
